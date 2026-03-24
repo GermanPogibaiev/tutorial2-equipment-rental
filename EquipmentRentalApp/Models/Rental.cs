@@ -38,12 +38,13 @@ namespace EquipmentRentalApp.Models
             return ActualReturnDate > DueDate;
         }
 
-        public override string ToString()
-        {
-            string ret = ActualReturnDate == null ? "Not returned" : ActualReturnDate.ToString();
-            return "Rental Id: " + Id + ", User: " + User.FirstName + " " + User.LastName +
-                   ", Equipment: " + Equipment.Name + ", From: " + RentalDate +
-                   ", Due: " + DueDate + ", Return: " + ret + ", Penalty: " + Penalty;
+       public override string ToString() {
+    
+    string ret = ActualReturnDate.HasValue ? ActualReturnDate.Value.ToString() : "Not returned";
+
+    return "Rental Id: " + Id + ", User: " + User.FirstName + " " + User.LastName +
+           ", Equipment: " + Equipment.Name + ", From: " + RentalDate +
+           ", Due: " + DueDate + ", Return: " + ret + ", Penalty: " + Penalty;
         }
     }
 }
