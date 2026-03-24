@@ -1,1 +1,103 @@
-﻿Console.WriteLine("Hello, World!");
+﻿using System;
+using System.Collections.Generic;
+using EquipmentRentalApp.Data;
+using EquipmentRentalApp.Models;
+using EquipmentRentalApp.Services;
+
+namespace EquipmentRentalApp
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            DataStore d = new DataStore();
+
+            UserService us = new UserService(d);
+            EquipmentService es = new EquipmentService(d);
+            RentalService rs = new RentalService(d);
+            ReportService reps = new ReportService(d);
+
+            Student s1 = us.addStudent("Jan","Kowalski","s123");
+            Student s2 = us.addStudent("Ola","Nowak","s124");
+            Employee e1 = us.addEmployee("Adam","Wis","IT");
+
+            Laptop l1 = es.addLaptop("Dell",16,"i5");
+            Laptop l2 = es.addLaptop("Lenovo",8,"i3");
+            Projector p1 = es.addProjector("Epson","1080p",3000);
+            Camera c1 = es.addCamera("Canon",24,true);
+
+            Console.WriteLine("users");
+            List<User> usrs = us.getAll();
+            for(int i=0;i<usrs.Count;i++)
+            {
+                Console.WriteLine(usrs[i]);
+            }
+
+            Console.WriteLine("eq");
+            List<Equipment> eqs = es.getAll();
+            for(int i=0;i<eqs.Count;i++)
+            {
+                Console.WriteLine(eqs[i]);
+            }
+
+            Console.WriteLine("rent ok");
+            Rental r1 = rs.rent(s1,l1,5);
+            if(r1 != null) Console.WriteLine("ok");
+            else Console.WriteLine("no");
+
+            Console.WriteLine("un");
+            es.setUn(p1.Id);
+
+            Console.WriteLine("rent bad");
+            Rental r2 = rs.rent(s2,p1,3);
+            if(r2 != null) Console.WriteLine("ok");
+            else Console.WriteLine("no");
+
+            Console.WriteLine("limit");
+            Rental r3 = rs.rent(s1,l2,4);
+            Rental r4 = rs.rent(s1,c1,2);
+
+            if(r3 != null) Console.WriteLine("ok");
+            else Console.WriteLine("no");
+
+            if(r4 != null) Console.WriteLine("ok");
+            else Console.WriteLine("no");
+
+            Console.WriteLine("ret on");
+            if(r1 != null)
+            {
+                d.Rentals[0].ActualReturnDate = d.Rentals[0].DueDate;
+                d.Rentals[0].Penalty = 0;
+                d.Rentals[0].Equipment.Status = EquipmentStatus.Available;
+                Console.WriteLine("ok");
+            }
+
+            Console.WriteLine("rent late");
+            Rental r5 = rs.rent(e1,c1,1);
+            if(r5 != null)
+            {
+                d.Rentals[d.Rentals.Count-1].ActualReturnDate = d.Rentals[d.Rentals.Count-1].DueDate.AddDays(3);
+                d.Rentals[d.Rentals.Count-1].Penalty = 30;
+                d.Rentals[d.Rentals.Count-1].Equipment.Status = EquipmentStatus.Available;
+                Console.WriteLine("30");
+            }
+
+            Console.WriteLine("act");
+            List<Rental> acts = rs.act(s1.Id);
+            for(int i=0;i<acts.Count;i++)
+            {
+                Console.WriteLine(acts[i]);
+            }
+
+            Console.WriteLine("av");
+            List<Equipment> avs = es.getAvail();
+            for(int i=0;i<avs.Count;i++)
+            {
+                Console.WriteLine(avs[i]);
+            }
+
+            Console.WriteLine("rep");
+            Console.WriteLine(reps.rep());
+        }
+    }
+}
